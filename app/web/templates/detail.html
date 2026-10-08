@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}{{ paper.title }} · 论文雷达{% endblock %}
+{% block body %}
+  <article class="detail">
+    <div class="chips">
+      {% if paper.focus %}<span class="chip focus">重点</span>{% endif %}
+      {% if paper.is_starred %}<span class="chip star">收藏</span>{% endif %}
+      {% for chip in paper.chips %}
+        <span class="chip">{{ chip }}</span>
+      {% endfor %}
+    </div>
+    <h1>{{ paper.title }}</h1>
+    <p class="meta">{{ paper.first_author or "作者未记录" }}</p>
+    <p class="actions">
+      {% if paper.url %}<a href="{{ paper.url }}">来源页面</a>{% endif %}
+      {% if paper.pdf_url %}<a href="{{ paper.pdf_url }}">PDF</a>{% endif %}
+      {% if paper.arxiv_id %}<a href="https://arxiv.org/abs/{{ paper.arxiv_id }}">arXiv</a>{% endif %}
+      {% if paper.doi %}<a href="https://doi.org/{{ paper.doi }}">DOI</a>{% endif %}
+      <form method="post" action="/papers/{{ paper.id }}/read?next={{ request.url.path }}">
+        <button type="submit">{% if paper.is_read %}标为未读{% else %}标为已读{% endif %}</button>
+      </form>
+      <form method="post" action="/papers/{{ paper.id }}/star?next={{ request.url.path }}">
+        <button type="submit">{% if paper.is_starred %}取消收藏{% else %}收藏{% endif %}</button>
+      </form>
+    </p>
+    {% if paper.abstract %}
+      <h2>摘要</h2>
+      <p class="abstract">{{ paper.abstract }}</p>
+    {% endif %}
+    <h2>为什么在雷达里</h2>
+    <ul>
+      {% for label in paper.reason_labels %}
+        <li>{{ label }}</li>
+      {% endfor %}
+    </ul>
+    {% if paper.topic_labels %}
+      <h2>主题</h2>
+      <p>{{ paper.topic_labels | join("、") }}</p>
+    {% endif %}
+    {% if paper.authors %}
+      <h2>作者与单位</h2>
+      <ul>
+        {% for author in paper.authors %}
+          <li>{{ author.author_name }}{% if author.institution_name %}（{{ author.institution_name }}）{% endif %}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    <h2>来源</h2>
+    <ul>
+      {% for source in paper.sources %}
+        <li>
+          {{ source.source }}
+          {% if source.presentation_type %}· {{ source.presentation_type }}{% endif %}
+          {% if source.source_url %}· <a href="{{ source.source_url }}">链接</a>{% endif %}
+          <br>
+          <span class="meta">源更新 {{ source.source_updated_at or "未知" }} · 上次核对 {{ source.last_verified_at }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+    <h2>时间</h2>
+    <dl class="times">
+      <div><dt>首次发表</dt><dd>{{ paper.first_published_at or "—" }}</dd></div>
+      <div><dt>首次看到</dt><dd>{{ paper.first_seen_at }}</dd></div>
+      <div><dt>arXiv</dt><dd>{{ paper.arxiv_published_at or "—" }}</dd></div>
+      <div><dt>会议</dt><dd>{{ paper.conference_published_at or "—" }}{% if paper.conference_year %}（{{ paper.conference_year }}）{% endif %}</dd></div>
+      <div><dt>期刊</dt><dd>{{ paper.journal_published_at or "—" }}</dd></div>
+      <div><dt>源数据更新</dt><dd>{{ paper.source_updated_at or "—" }}</dd></div>
+      <div><dt>上次核对</dt><dd>{{ paper.last_verified_at or "—" }}</dd></div>
+    </dl>
+  </article>
+{% endblock %}

@@ -1,0 +1,243 @@
+# 机器人操作论文雷达的全部可调规则。加实验室或主题词只改这个文件。
+
+window:
+  start: "2024-10-08"
+  end: "2026-10-08"
+
+track_interval_hours: 6
+reconcile_lookback_days: 180
+database: data/papers.db
+mailto: local@localhost
+
+arxiv:
+  page_size: 50
+  # 增量同步每次只向前翻有限页，回填会一直翻到时间窗结束。
+  pages_per_incremental: 2
+  # 弱标题命中只在这个分类生效。
+  weak_category: cs.RO
+  # 非 cs.RO 只按强标题词检索，避免把泛机器学习论文收进来。
+  other_categories:
+    - cs.LG
+    - cs.AI
+    - cs.CV
+
+openreview:
+  failure_limit: 5
+  pause_hours: 24
+  venues:
+    - id: robot-learning.org/CoRL/2024/Conference
+      name: CoRL
+      year: 2024
+    - id: robot-learning.org/CoRL/2025/Conference
+      name: CoRL
+      year: 2025
+    - id: robot-learning.org/CoRL/2026/Conference
+      name: CoRL
+      year: 2026
+
+virtual_sites:
+  - venue: NeurIPS
+    year: 2024
+    url: https://neurips.cc/static/virtual/data/neurips-2024-orals-posters.json
+  - venue: NeurIPS
+    year: 2025
+    url: https://neurips.cc/static/virtual/data/neurips-2025-orals-posters.json
+  - venue: ICLR
+    year: 2025
+    url: https://iclr.cc/static/virtual/data/iclr-2025-orals-posters.json
+  - venue: ICLR
+    year: 2026
+    url: https://iclr.cc/static/virtual/data/iclr-2026-orals-posters.json
+  - venue: CVPR
+    year: 2025
+    url: https://cvpr.thecvf.com/static/virtual/data/cvpr-2025-orals-posters.json
+  - venue: CVPR
+    year: 2026
+    url: https://cvpr.thecvf.com/static/virtual/data/cvpr-2026-orals-posters.json
+
+rss:
+  - year: 2025
+    url: https://roboticsconference.org/2025/program/papers/
+    # RSS 2025 每篇录用论文都有 spotlight talk 和 poster，展示类型用 spotlight。
+    default_presentation: spotlight
+  - year: 2026
+    url: https://roboticsconference.org/2026/program/papers/
+    default_presentation: spotlight
+
+# 只有页面上明确写出 oral / spotlight / highlight / award 的条目才会变成会议信号。
+corl_pages:
+  - venue: CoRL
+    year: 2025
+    url: https://www.corl.org/
+  - venue: CoRL
+    year: 2025
+    url: https://openreview.net/group?id=robot-learning.org/CoRL/2025/Conference
+
+# 2026-10-08 实测这些官网返回 403。适配器会记一次并跳过，不把短口头报告当成 oral。
+program_pages:
+  - venue: ICRA
+    year: 2025
+    url: https://2025.ieee-icra.org/
+  - venue: ICRA
+    year: 2026
+    url: https://2026.ieee-icra.org/
+  - venue: IROS
+    year: 2025
+    url: https://www.iros2025.org/
+
+journals:
+  - name: Science Robotics
+    issn: "2470-9476"
+  - name: IJRR
+    issn: "0278-3649"
+  - name: TRO
+    issn: "1552-3098"
+
+awesome_repos:
+  - jonyzhang2023/awesome-embodied-vla-va-vln
+  - HCPLab-SYSU/Embodied_AI_Paper_List
+
+awesome_sections:
+  include:
+    - vision-language-action
+    - manipulation
+    - robot learning
+    - sim-to-real
+    - embodied manipulation
+  exclude:
+    - vln
+    - simulator
+    - dataset
+
+# 命中 include 章节时，即使标题没有关键词，也打上对应主题标签，方便看板分组。
+section_topics:
+  vision-language-action: vla
+  manipulation: manipulation
+  sim-to-real: sim_to_real
+  robot learning: robot_learning
+  embodied manipulation: manipulation
+  dexterous: dexterous_tactile
+  tactile: dexterous_tactile
+
+labs:
+  - id: nvidia
+    label: NVIDIA
+    names:
+      - NVIDIA
+      - NVIDIA Research
+      - NVIDIA Corporation
+      - NVIDIA GEAR
+      - NVIDIA Seattle Robotics Lab
+  - id: physical_intelligence
+    label: Physical Intelligence
+    names:
+      - Physical Intelligence
+  - id: google_deepmind
+    label: Google DeepMind
+    names:
+      - Google DeepMind
+      - DeepMind
+      - Google Robotics
+  - id: tri
+    label: TRI
+    names:
+      - Toyota Research Institute
+      - TRI
+  - id: figure
+    label: Figure
+    names:
+      - Figure AI
+      - Figure
+  - id: onex
+    label: 1X
+    names:
+      - 1X Technologies
+      - 1X
+  - id: boston_dynamics
+    label: Boston Dynamics
+    names:
+      - Boston Dynamics
+  - id: apptronik
+    label: Apptronik
+    names:
+      - Apptronik
+  - id: covariant
+    label: Covariant
+    names:
+      - Covariant
+  - id: rai
+    label: RAI Institute
+    names:
+      - RAI Institute
+      - Robotics and AI Institute
+  - id: meta_fair
+    label: Meta FAIR
+    names:
+      - Meta FAIR
+      - FAIR at Meta
+      - Facebook AI Research
+
+optional_labs:
+  - id: amazon
+    label: Amazon
+    enabled: true
+    names:
+      - Amazon Robotics
+      - Amazon Science
+  - id: microsoft_research
+    label: Microsoft Research
+    enabled: true
+    names:
+      - Microsoft Research
+
+topics:
+  manipulation:
+    label: Manipulation
+    strong_title:
+      - robotic manipulation
+    weak_title:
+      - manipulation
+  vla:
+    label: VLA
+    strong_title:
+      - vision-language-action
+      - vision language action
+      - VLA
+    weak_title: []
+  dexterous_tactile:
+    label: Dexterous / Tactile
+    strong_title:
+      - dexterous
+      - bimanual
+      - tactile
+    weak_title: []
+  contact_assembly:
+    label: Contact / Assembly
+    strong_title:
+      - contact-rich
+      - contact rich
+      - non-prehensile
+      - nonprehensile
+    weak_title:
+      - assembly
+      - insertion
+      - grasping
+      - regrasp
+      - tool use
+  robot_learning:
+    label: Robot Learning
+    strong_title:
+      - diffusion policy
+      - visuomotor
+    weak_title:
+      - imitation learning
+      - policy learning
+      - robot learning
+      - reinforcement learning
+  sim_to_real:
+    label: Sim-to-real
+    strong_title:
+      - sim-to-real
+      - sim to real
+      - sim2real
+    weak_title: []

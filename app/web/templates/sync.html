@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}同步 · 论文雷达{% endblock %}
+{% block body %}
+  <section class="toolbar">
+    <h1>同步</h1>
+    <p class="meta">增量每 6 小时走 arXiv 和新的列表。每天 03:15 重读会议快照和 RSS。OpenReview 连续失败 5 次后会暂停 24 小时。</p>
+    {% if busy %}<p class="notice">正在同步。</p>{% endif %}
+    <form method="post" action="/sync?mode=incremental">
+      <button type="submit">立即增量</button>
+    </form>
+    <form method="post" action="/sync?mode=reconcile">
+      <button type="submit">立即对账</button>
+    </form>
+    <form method="post" action="/sync?mode=backfill">
+      <button type="submit">继续回填</button>
+    </form>
+  </section>
+  <h2>最近运行</h2>
+  <table>
+    <thead>
+      <tr><th>时间</th><th>模式</th><th>状态</th><th>说明</th></tr>
+    </thead>
+    <tbody>
+      {% for run in runs %}
+        <tr>
+          <td>{{ run.started_at }}</td>
+          <td>{{ run.mode }}</td>
+          <td>{{ run.status }}</td>
+          <td class="message">{{ run.message }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="4">还没有同步记录。</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <h2>游标</h2>
+  <table>
+    <thead>
+      <tr><th>源</th><th>状态</th><th>游标</th><th>失败次数</th><th>暂停至</th><th>说明</th></tr>
+    </thead>
+    <tbody>
+      {% for cursor in cursors %}
+        <tr>
+          <td>{{ cursor.source }}</td>
+          <td>{{ cursor.last_status }}</td>
+          <td>{{ cursor.cursor or "" }}</td>
+          <td>{{ cursor.consecutive_failures }}</td>
+          <td>{{ cursor.disabled_until or "" }}</td>
+          <td class="message">{{ cursor.last_message }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="6">还没有游标。</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

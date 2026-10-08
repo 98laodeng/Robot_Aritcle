@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}机器人操作论文雷达{% endblock %}</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="/">论文雷达</a>
+    <p class="tagline">会议信号、实验室、主题和策展列表。只说明为什么值得看。</p>
+    <nav>
+      {% for item in nav %}
+        <a href="{{ item.href }}">{{ item.label }}</a>
+      {% endfor %}
+    </nav>
+    <p class="stats">未读重点 {{ stats.focus_unread }} · 收藏 {{ stats.starred }} · 未读 {{ stats.unread }} · 共 {{ stats.total }}</p>
+  </header>
+  <main>
+    {% block body %}{% endblock %}
+  </main>
+</body>
+</html>

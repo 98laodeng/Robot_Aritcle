@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}{{ heading }} · 论文雷达{% endblock %}
+{% block body %}
+  <section class="toolbar">
+    <h1>{{ heading }}</h1>
+    <form class="filters" method="get" action="/papers">
+      <input type="hidden" name="group" value="{{ filters.group }}">
+      <input type="search" name="q" value="{{ filters.q }}" placeholder="搜索标题或摘要">
+      <select name="venue">
+        <option value="">全部会议</option>
+        {% for venue in venues %}
+          <option value="{{ venue }}" {% if filters.venue == venue %}selected{% endif %}>{{ venue }}</option>
+        {% endfor %}
+      </select>
+      <select name="year">
+        <option value="">全部年份</option>
+        {% for year in years %}
+          <option value="{{ year }}" {% if filters.year == year|string %}selected{% endif %}>{{ year }}</option>
+        {% endfor %}
+      </select>
+      <select name="presentation">
+        <option value="">全部展示</option>
+        {% for presentation in presentations %}
+          <option value="{{ presentation }}" {% if filters.presentation == presentation %}selected{% endif %}>{{ presentation }}</option>
+        {% endfor %}
+      </select>
+      <select name="reason">
+        <option value="">全部理由</option>
+        {% for key, label in reasons.items() %}
+          <option value="{{ key }}" {% if filters.reason == key %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+      <select name="lab">
+        <option value="">全部实验室</option>
+        {% for lab in labs %}
+          <option value="{{ lab.id }}" {% if filters.lab == lab.id %}selected{% endif %}>{{ lab.label }}</option>
+        {% endfor %}
+      </select>
+      <select name="topic">
+        <option value="">全部主题</option>
+        {% for topic in topics %}
+          <option value="{{ topic.id }}" {% if filters.topic == topic.id %}selected{% endif %}>{{ topic.label }}</option>
+        {% endfor %}
+      </select>
+      <label class="check"><input type="checkbox" name="unread" value="1" {% if filters.unread == "1" %}checked{% endif %}> 只看未读</label>
+      <label class="check"><input type="checkbox" name="starred" value="1" {% if filters.starred == "1" %}checked{% endif %}> 只看收藏</label>
+      <button type="submit">筛选</button>
+    </form>
+  </section>
+  {% if papers %}
+    <ul class="cards">
+      {% for paper in papers %}
+        <li class="card">
+          {% set back = request.url.path ~ (('?' ~ request.url.query) if request.url.query else '') %}
+          <div class="chips">
+            {% if paper.focus %}<span class="chip focus">重点</span>{% endif %}
+            {% if paper.is_starred %}<span class="chip star">收藏</span>{% endif %}
+            {% for chip in paper.chips %}
+              <span class="chip">{{ chip }}</span>
+            {% endfor %}
+            <form method="post" action="/papers/{{ paper.id }}/star?next={{ back | urlencode }}">
+              <button type="submit" class="text-button">{% if paper.is_starred %}取消收藏{% else %}收藏{% endif %}</button>
+            </form>
+          </div>
+          <h2><a href="/papers/{{ paper.id }}">{{ paper.title }}</a></h2>
+          <p class="meta">{{ paper.first_author }}{% if paper.first_published_at %} · {{ paper.first_published_at }}{% endif %}</p>
+          {% if paper.abstract %}
+            <p class="abstract">{{ paper.abstract[:280] }}{% if paper.abstract|length > 280 %}…{% endif %}</p>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    {% if filters.starred == "1" %}
+      <p class="empty">还没有收藏。在论文卡片或详情页点「收藏」就会出现在这里。</p>
+    {% else %}
+      <p class="empty">这个筛选下还没有论文。可以先在「同步」里回填，或放宽条件。</p>
+    {% endif %}
+  {% endif %}
+{% endblock %}
